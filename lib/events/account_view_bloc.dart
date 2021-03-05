@@ -22,7 +22,7 @@ class ViewAccountBloc {
 
 
 
-  final _transactionStateStreamController = StreamController<List<Transaction>>();
+  final _transactionStateStreamController = StreamController<List<Transaction>>.broadcast();
   StreamSink<List<Transaction>> get _transactionStateSink => _transactionStateStreamController.sink;
   Stream<List<Transaction>> get transactionStateStream => _transactionStateStreamController.stream;
 

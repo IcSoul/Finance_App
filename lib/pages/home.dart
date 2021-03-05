@@ -1,41 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-// Page Imports
 import 'account/account_home.dart';
 import 'budget/budget_home.dart';
 import 'archive/archive_home.dart';
 
+
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context){
-    return MaterialApp(
-      title: "Finance App",
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
-          title: Text("Home")
+            title: Text("Home")
         ),
         body: Container(
-          padding: EdgeInsets.only(
-            left: 20.0
-          ),
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AccountPage())),
-                child: _rowContainer(Icons.account_balance, "Accounts")
-              ),
-              GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => BudgetPage())),
-                child: _rowContainer(Icons.pie_chart, "Budgets"),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ArchivePage())),
-                child: _rowContainer(Icons.archive, "Archived"),
-              )
-            ],
-          )
+            padding: EdgeInsets.only(
+                left: 20.0
+            ),
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: () => Get.to(() => AccountPage()),
+                  child: _rowContainer(Icons.account_balance, "Accounts")
+                ),
+                GestureDetector(
+                  //onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => BudgetPage())),
+                  onTap: () => Get.to(() => BudgetPage()),
+                  child: _rowContainer(Icons.pie_chart, "Budgets"),
+                ),
+                GestureDetector(
+                  //onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ArchivePage())),
+                  onTap: () => Get.to(() => ArchivePage()),
+                  child: _rowContainer(Icons.archive, "Archived"),
+                )
+              ],
+            )
         )
-      )
     );
   }
 }

@@ -55,4 +55,11 @@ class AccountTable {
 
     return account;
   }
+
+  Future deleteAccount(int id) async {
+    final db = await DatabaseProvider().database;
+    await db.rawDelete("DELETE FROM $TABLE_NAME WHERE $COLUMN_ID = $id");
+
+    return true;
+  }
 }

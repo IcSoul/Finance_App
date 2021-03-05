@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:finance_app/pages/shared.dart';
+import 'package:get/get.dart';
 
 import 'package:finance_app/model/account.dart';
 import 'package:finance_app/model/transaction.dart';
@@ -32,6 +33,7 @@ class _State extends State<CreateTransactionPage> {
       home: Scaffold(
         appBar: AppBar(
           title: Text("Create New Transaction"),
+          automaticallyImplyLeading: false,
         ),
         body: Container(
           padding: EdgeInsets.all(20),
@@ -45,9 +47,13 @@ class _State extends State<CreateTransactionPage> {
                     hintText: "Enter a date for this transaction"
                   ),
                   validator: (value) {
-                    if(value.isEmpty) {
-                      return "Please enter a date for this transaction"; }
-                    return null;
+                    try {
+                      if(!GetUtils.isDateTime(DateTime.parse(value).toString())){
+                        return "Please enter a valid date for this transaction"; }
+                      return null;
+                    } on Exception catch (e) {
+                      return "Please enter a valid date for this transaction";
+                    }
                   },
                   onSaved: (value) { _date = value; }
                 ),
@@ -59,10 +65,8 @@ class _State extends State<CreateTransactionPage> {
                       hintText: "Enter an amount for this transaction"
                     ),
                     validator: (value) {
-                      if(value.isEmpty){
-                        return "Please enter a value for the amount"; }
-                      else if(double.tryParse(value) == null){
-                        return "Please enter a valid number"; }
+                      if(!GetUtils.isCurrency(value)){
+                        return "Please enter a valid amount"; }
                       return null;
                     },
                     onSaved: (value) { _amount = double.tryParse(value); },
@@ -103,35 +107,46 @@ class _State extends State<CreateTransactionPage> {
                   },
                 ),
 
-                ElevatedButton(
-                  child: Text("Submit"),
-                  onPressed: () async {
-                    if(!_formKey.currentState.validate()){
-                      return null; }
+                Container(
+                  padding: EdgeInsets.only(top: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        child: Text("Cancel"),
+                        onPressed: () => Get.back(),
+                      ),
 
-                    _formKey.currentState.save();
+                      SizedBox(width: 30),
 
-                    Transaction transaction = Transaction(
-                      date: _date,
-                      amount: _amount,
-                      description: _description,
-                      type: _radioValue,
-                      account: widget.id
-                    );
+                      ElevatedButton(
+                        child: Text("Submit"),
+                        onPressed: () async {
+                          if(!_formKey.currentState.validate()){
+                            return null; }
 
-                    /*
-                    * Figure out a better way to write this
-                    * */
+                          _formKey.currentState.save();
 
-                    Account account = await AccountTable().getAccount(widget.id);
-                    account.balance = transaction.type.toLowerCase() == "debit"
-                      ? account.balance - transaction.amount : account.balance + transaction.amount;
+                          Transaction transaction = Transaction(
+                              date: _date,
+                              amount: _amount,
+                              description: _description,
+                              type: _radioValue,
+                              account: widget.id
+                          );
 
-                    TransactionTable().insertTransaction(transaction)
-                      .then((value) => AccountTable().updateAccount(account)
-                      .then((value) => Navigator.pop(context)));
-                  },
-                )
+                          Account account = await AccountTable().getAccount(widget.id);
+                          account.balance = transaction.type.toLowerCase() == "debit"
+                              ? account.balance - transaction.amount : account.balance + transaction.amount;
+
+                          TransactionTable().insertTransaction(transaction)
+                              .then((value) => AccountTable().updateAccount(account)
+                              .then((value) => Navigator.pop(context)));
+                        },
+                      )
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

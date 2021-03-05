@@ -36,10 +36,39 @@ class TransactionTable {
     return transactionList;
   }
 
+  Future<Transaction> getTransaction(int id) async {
+    final db = await DatabaseProvider().database;
+    var transaction = await db.rawQuery("SELECT * FROM $TABLE_NAME WHERE $COLUMN_ID = $id");
+
+    Transaction temp = Transaction.fromMap(transaction.asMap()[0]);
+    return temp;
+  }
+
   Future<Transaction> insertTransaction(Transaction transaction) async {
     final db = await DatabaseProvider().database;
     transaction.id = await db.insert(TABLE_NAME, transaction.toMap());
 
     return transaction;
+  }
+
+  Future<Transaction> updateTransaction(Transaction transaction) async {
+    final db = await DatabaseProvider().database;
+    await db.update(TABLE_NAME, transaction.toMap(), where: '$COLUMN_ID = ?', whereArgs: [transaction.id]);
+
+    return transaction;
+  }
+
+  Future deleteTransactions(int id) async {
+    final db = await DatabaseProvider().database;
+    await db.rawDelete("DELETE FROM $TABLE_NAME WHERE $COLUMN_ACCOUNT = $id");
+
+    return true;
+  }
+
+  Future deleteTransaction(int id) async {
+    final db = await DatabaseProvider().database;
+    await db.rawDelete("DELETE FROM $TABLE_NAME WHERE $COLUMN_ID = $id");
+
+    return true;
   }
 }
